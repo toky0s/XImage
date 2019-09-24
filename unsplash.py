@@ -14,7 +14,8 @@ class ExceededQuantity(Exception):
     def __init__(self, count):
         self.count = count
 
-# logging.basicConfig(level=logging.INFO)
+
+logging.basicConfig(level=logging.INFO)
 
 
 class Unsplash:
@@ -30,7 +31,6 @@ class Unsplash:
 
     def listPhotos(self, page=1, per_page=10, order_by='lastest', option='regular'):
         # Get a single page from the list of all photos
-        # https://unsplash.com/napi/photos?page=1&per_page=24&order_by=lastest
         params = {'page': page, 'per_page': per_page, 'order_by': order_by}
         r = requests.get('https://unsplash.com/napi/photos', params=params)
         logging.info('REQUEST: page {}, per_page {}, order_by {}'.format(
@@ -47,7 +47,6 @@ class Unsplash:
 
     def randomPhotos(self, count=1, option='regular'):
         """count The number of photos to return. (Default: 1; max: 30)"""
-        # https://unsplash.com/napi/photos/random?count=5
         params = {'count': count}
         r = requests.get(
             'https://unsplash.com/napi/photos/random', params=params)
@@ -63,7 +62,6 @@ class Unsplash:
 
     def searchPhotos(self, query, page=1, per_page=10, option='regular'):
         # Get a single page of photo results for a query
-        # https://unsplash.com/napi/search/photos?query=bird
         params = {'query': query, 'page': page, 'per_page': per_page}
         r = requests.get(
             'https://unsplash.com/napi/search/photos', params=params)
