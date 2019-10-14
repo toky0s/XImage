@@ -133,6 +133,6 @@ class GraphicRiver:
         return check
 
 if __name__ == '__main__':
-    a = Unsplash('Dogs')
-    a.searchPhotos('dog')
+    a = Unsplash('Cats')
+    a.searchPhotos('cat')
     a.download()
