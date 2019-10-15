@@ -1,6 +1,7 @@
 from tkinter import filedialog, messagebox
 from tkinter import *
 import os
+import clipboard
 
 
 def is_check():
@@ -22,9 +23,11 @@ def check_path():
     if os.path.exists(folder_path_text.get()):
         pass # goto download
     else:
-        if messagebox.askyesno('Warning', 'The path does not exist, do you want create a new folder?'):
-            print('create new folder')
-            messagebox.showinfo('Create new folder', 'DONE!')
+        if folder_path_text.get()=='':
+            messagebox.showwarning('Warning','Please enter path!')
+        elif messagebox.askyesno('Warning', 'The path does not exist, do you want create a new folder?'):
+            print('create new folder {}'.format(folder_path_text.get()))
+            messagebox.showinfo('Info', '{}'.format(folder_path_text.get()))
 
 # Master========================================================
 master = Tk()
@@ -42,10 +45,10 @@ frame.update()
 l = Label(master, background='#229954', text='Image Thief', foreground='white')
 l.grid(row=0,column=0,columnspan=3)
 
-folder_label = Label(master, text='Put at:')
+folder_label = Label(master, text='Save at:')
 folder_label.grid(row=1,sticky=W)
 
-urls_label = Label(master, text='Urls:')
+urls_label = Label(master, text='Url:')
 urls_label.grid(row=2, sticky=W)
 
 number_download_label = Label(master, text='How much:')
