@@ -81,5 +81,5 @@ download_bt.grid(row=2, column=2)
 is_all_var = IntVar()
 is_all_checkbutton = Checkbutton(master,text='All',variable=is_all_var, command=is_check)
 is_all_checkbutton.grid(row=4,column=1,sticky=W)
-
+  
 master.mainloop()

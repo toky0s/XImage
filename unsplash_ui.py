@@ -1,5 +1,5 @@
 from tkinter import *
-
+from tkinter.filedialog import askdirectory
 
 class FrameGroupRadiobutton(Frame):
 
@@ -27,7 +27,7 @@ class UnsplashUI(Frame):
         self.setupUI()
 
     def setupUI(self):
-        label_name = Label(self, text='Name:')
+        label_name = Label(self, text='Query:')
         label_name.grid(row=0, column=0, sticky=W)
 
         label_amount = Label(self, text='Amount:')
@@ -46,13 +46,14 @@ class UnsplashUI(Frame):
         label_random.grid(row=5, column=0, sticky=W)
 
         entry_name = Entry(self)
-        entry_name.grid(row=0, column=1, sticky=W)
+        entry_name.grid(row=0, column=1, sticky='we')
 
         entry_amount = Entry(self)
-        entry_amount.grid(row=1, column=1, sticky=W)
+        entry_amount.grid(row=1, column=1, sticky='we')
 
-        entry_save = Entry(self)
-        entry_save.grid(row=2, column=1, sticky=W)
+        self.var_file_name = StringVar()
+        entry_save = Entry(self, textvariable=self.var_file_name)
+        entry_save.grid(row=2, column=1, sticky='we')
 
         QUALITIES = {
             'Raw': 'raw',
@@ -79,6 +80,15 @@ class UnsplashUI(Frame):
         var_random = IntVar()
         checkbutton_random = Checkbutton(self,variable = var_random)
         checkbutton_random.grid(row=5, column=1, sticky=W)
+
+        button_browse = Button(self,text='Browse',command=self.choice_folder)
+        button_browse.grid(row=2, column=2, sticky=W)
+    
+        self.grid_rowconfigure(0, weight=1)
+
+    def choice_folder(self):
+        dialog_choice_folder = askdirectory()
+        self.var_file_name.set(dialog_choice_folder)
 
 
 if __name__ == '__main__':

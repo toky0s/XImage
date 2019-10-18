@@ -1,8 +1,8 @@
-import tkinter as tk
+from tkinter import *
 
 
-class EntryWithPlaceholder(tk.Entry):
-    def __init__(self, master=None, placeholder="PLACEHOLDER", textvariable=None,color='grey'):
+class EntryWithPlaceholder(Entry):
+    def __init__(self, master=None, placeholder="PLACEHOLDER", textvariable=None, color='grey'):
         super().__init__(master, textvariable=textvariable)
 
         self.placeholder = placeholder
@@ -28,20 +28,52 @@ class EntryWithPlaceholder(tk.Entry):
             self.put_placeholder()
 
 
+class FrameInformationForm(Frame):
+
+    def __init__(self, master=None):
+        super().__init__(master=master)
+        self.variable_1 = StringVar()
+        self.variable_2 = StringVar()
+        self.setupUI()
+
+    def setupUI(self):
+        label_name = Label(self, text='Name:')
+        label_name.grid(row=0, column=0, sticky=W)
+
+        label_age = Label(self, text='Age:')
+        label_age.grid(row=1, column=0, sticky=W)
+
+        entry_name = Entry(self,textvariable=self.variable_1)
+        entry_name.grid(row=0, column=1, sticky=W)
+        entry_age = Entry(self,textvariable=self.variable_2)
+        entry_age.grid(row=1, column=1, sticky=W)
+
+        button_show_info = Button(self,text='Show info', command=self.showinfo)
+        button_show_info.grid(row=2,column=0, sticky=W)
+
+    def showinfo(self):
+        print('Your name:',self.variable_1.get(),'\nYour age:',self.variable_1.get())
+
+
 if __name__ == "__main__":
 
-    def update_text_in_entry():
-        value_1.set('update 1')
-        value_2.set('update 2')
+    # def update_text_in_entry():
+    #     value_1.set('update 1')
+    #     value_2.set('update 2')
 
-    root = tk.Tk()
+    # root = Tk()
 
-    value_1 = tk.StringVar()
-    value_2 = tk.StringVar()
-    username = EntryWithPlaceholder(root, "username",textvariable=value_1).pack()
-    password = EntryWithPlaceholder(root, "password", textvariable=value_2,color='blue').pack()
-    
-    b = tk.Button(root,text='Update entry', command=update_text_in_entry)
-    b.pack()
-    
+    # value_1 = StringVar()
+    # value_2 = StringVar()
+    # username = EntryWithPlaceholder(
+    #     root, "username", textvariable=value_1).pack()
+    # password = EntryWithPlaceholder(
+    #     root, "password", textvariable=value_2, color='blue').pack()
+
+    # b = Button(root, text='Update entry', command=update_text_in_entry)
+    # b.pack()
+
+    root = Tk()
+    form = FrameInformationForm(root)
+    form.pack()
     root.mainloop()
