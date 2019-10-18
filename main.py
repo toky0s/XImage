@@ -1,4 +1,5 @@
 from tkinter import filedialog, messagebox
+from tkinter.ttk import *
 from tkinter import *
 import os
 import clipboard

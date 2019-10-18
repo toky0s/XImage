@@ -1,5 +1,8 @@
-from tkinter import *
 from tkinter.filedialog import askdirectory
+
+from tkinter import *
+from tkinter.ttk import *
+from CallTipWindow import createToolTip
 
 class FrameGroupRadiobutton(Frame):
 
@@ -45,15 +48,22 @@ class UnsplashUI(Frame):
         label_random = Label(self, text='Random:')
         label_random.grid(row=5, column=0, sticky=W)
 
-        entry_name = Entry(self)
+
+        self.var_name = StringVar()
+        entry_name = Entry(self, textvariable=self.var_name)
         entry_name.grid(row=0, column=1, sticky='we')
 
-        entry_amount = Entry(self)
+        self.var_amount = IntVar()
+        entry_amount = Entry(self, textvariable=self.var_amount)
         entry_amount.grid(row=1, column=1, sticky='we')
 
         self.var_file_name = StringVar()
         entry_save = Entry(self, textvariable=self.var_file_name)
         entry_save.grid(row=2, column=1, sticky='we')
+
+        button_browse = Button(self, text='Browse', command=self.choice_folder)
+        button_browse.grid(row=2, column=2, sticky='we')
+
 
         QUALITIES = {
             'Raw': 'raw',
@@ -62,9 +72,9 @@ class UnsplashUI(Frame):
             'Thumnail': 'thumnail',
         }
 
-        var_quality_rb = StringVar()
+        self.var_quality_rb = StringVar()
         group_quality_radiobutton = FrameGroupRadiobutton(
-            self, side=LEFT, variable=var_quality_rb, dict_option=QUALITIES, initialize='raw')
+            self, side=LEFT, variable=self.var_quality_rb, dict_option=QUALITIES, initialize='raw')
         group_quality_radiobutton.grid(row=3, column=1, sticky=W)
 
         ORDER_BY = {
@@ -72,24 +82,30 @@ class UnsplashUI(Frame):
             'Oldest': 'oldest',
             'Popular': 'popular',
         }
-        var_order_by_rb = StringVar()
+        
+        self.var_order_by_rb = StringVar()
         group_order_by_radiobutton = FrameGroupRadiobutton(
-            self, side=LEFT, variable=var_order_by_rb, dict_option=ORDER_BY, initialize='latest')
+            self, side=LEFT, variable=self.var_order_by_rb, dict_option=ORDER_BY, initialize='latest')
         group_order_by_radiobutton.grid(row=4, column=1, sticky=W)
 
-        var_random = IntVar()
-        checkbutton_random = Checkbutton(self,variable = var_random)
+        self.var_random = IntVar()
+        checkbutton_random = Checkbutton(self,variable = self.var_random)
         checkbutton_random.grid(row=5, column=1, sticky=W)
+        createToolTip(checkbutton_random,'Max amount is 30')
 
-        button_browse = Button(self,text='Browse',command=self.choice_folder)
-        button_browse.grid(row=2, column=2, sticky=W)
-    
-        self.grid_rowconfigure(0, weight=1)
+        progress = Progressbar(self,orient=HORIZONTAL, length=100, mode='determinate')
+        progress.grid(row=6, column=0, columnspan=2, sticky='we')
+        # progress.grid_remove()
+
+        button_download = Button(self, text='Download now!', compound=RIGHT, command=self.download)
+        button_download.grid(row=6, column=2)
 
     def choice_folder(self):
         dialog_choice_folder = askdirectory()
         self.var_file_name.set(dialog_choice_folder)
 
+    def download(self):
+        pass
 
 if __name__ == '__main__':
     root = Tk()

@@ -1,33 +1,47 @@
-from tkinter import *
+# importing tkinter module
+from tkinter import * 
+from tkinter.ttk import *
+
+# creating tkinter window
+root = Tk()
+
+# Progress bar widget
+progress = Progressbar(root, orient=HORIZONTAL,
+                       length=100, mode='determinate')
+
+# Function responsible for the updation
+# of the progress bar value
 
 
-master = Tk()
-master.geometry('300x200')
+def bar():
+    import time
+    progress['value'] = 20
+    root.update_idletasks()
+    time.sleep(1)
 
-f = Frame(master, background='red')
-f.pack()
+    progress['value'] = 40
+    root.update_idletasks()
+    time.sleep(1)
 
-l_name = Label(f, text='Name:')
-l_name.grid(row=0, column=0, sticky=W)
+    progress['value'] = 50
+    root.update_idletasks()
+    time.sleep(1)
 
-l_age = Label(f, text='Age:')
-l_age.grid(row=1, column=0, sticky=W)
+    progress['value'] = 60
+    root.update_idletasks()
+    time.sleep(1)
 
-var_name = StringVar()
-entry_name = Entry(f, textvariable=var_name)
-entry_name.grid(row=0, column=1, sticky=W)
-
-var_age = StringVar()
-entry_age = Entry(f, textvariable=var_age)
-entry_age.grid(row=1, column=1, sticky=W)
-
-
-def show_info():
-    print("Your name: {}\nYour age: {}".format(var_name.get(), var_age.get()))
+    progress['value'] = 80
+    root.update_idletasks()
+    time.sleep(1)
+    progress['value'] = 100
 
 
-button_print = Button(f, text='Show info', command=show_info)
-button_print.grid(row=2, column=0, sticky=W)
+progress.pack(pady=10)
 
-master.mainloop()
+# This button will initialize
+# the progress bar
+Button(root, text='Start', command=bar).pack(pady=10)
 
+# infinite loop
+mainloop()
