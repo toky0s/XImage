@@ -8,6 +8,9 @@ import time
 from urllib.request import urlretrieve
 from bs4 import BeautifulSoup
 
+ACCESS_KEY = '6923efd2545c3bfd5788fc87f097617ff90f6f9bed51ac945e873dabb17c4d2e'
+SECRET_KEY = 'ee32bbfc49a119a89f6c30a7ea913ee597eb26021dacb57cd55af5cfbf8d8f9e'
+
 
 class ExceededQuantity(Exception):
 

@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter.ttk import *
 from unsplash_ui import UnsplashUI
 
 
@@ -8,9 +9,9 @@ class MyApp(Frame):
         super().__init__(master=master)
         self.master = master
         self.master.title('Image Thief')
-        self.master.iconbitmap('bandit.ico')
+        self.master.iconbitmap('icon/bandit.ico')
         title_app = Label(self.master, text='Image Thief',
-                          background='#229954', foreground='white')
+                          background='#229954', foreground='white', anchor=CENTER)
         title_app.pack(fill=X)
         self.setupUI()
 
@@ -21,8 +22,10 @@ class MyApp(Frame):
         self.var_frame_group_option = IntVar()
         self.var_frame_group_option.set(1)
 
+        icon_unsplash = PhotoImage(file='icon/photo-camera.png')
         radiobutton_unsplash_ui = Radiobutton(
-            frame_group_option, text='Unsplash', variable=self.var_frame_group_option, value=1, command=self.set_ui)
+            frame_group_option, text='Unsplash', image=icon_unsplash,variable=self.var_frame_group_option, value=1, command=self.set_ui, compound=LEFT)
+        radiobutton_unsplash_ui.image = icon_unsplash
         radiobutton_graphicriver_ui = Radiobutton(
             frame_group_option, text='GraphicRiver', variable=self.var_frame_group_option, value=2, command=self.set_ui)
 
