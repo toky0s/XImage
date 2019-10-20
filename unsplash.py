@@ -83,7 +83,7 @@ class Unsplash:
                 name = i['id']
                 url = i['urls'][option]
                 self.urls[name] = url
-                logging.info('{} --> urls'.format(name))
+                logging.info('{} -> urls'.format(name))
         return (r.status_code, j['total'])
 
     def download(self, wait_time=2):

@@ -56,23 +56,6 @@ class FrameInformationForm(Frame):
 
 
 if __name__ == "__main__":
-
-    # def update_text_in_entry():
-    #     value_1.set('update 1')
-    #     value_2.set('update 2')
-
-    # root = Tk()
-
-    # value_1 = StringVar()
-    # value_2 = StringVar()
-    # username = EntryWithPlaceholder(
-    #     root, "username", textvariable=value_1).pack()
-    # password = EntryWithPlaceholder(
-    #     root, "password", textvariable=value_2, color='blue').pack()
-
-    # b = Button(root, text='Update entry', command=update_text_in_entry)
-    # b.pack()
-
     root = Tk()
     form = FrameInformationForm(root)
     form.pack()

@@ -3,15 +3,12 @@ from tkinter import *
 from tkinter.ttk import *
 from CallTipWindow import createToolTip
 from urllib import request
+from PIL import Image, ImageTk
 import os
 import requests
-import logging
 import json
 import time
 
-
-
-logging.basicConfig(level=logging.INFO)
 
 class FrameGroupRadiobutton(Frame):
 
@@ -31,83 +28,94 @@ class FrameGroupRadiobutton(Frame):
                 self, text=text, variable=self.variable, value=value)
             radiobt_quality.pack(side=self.side, anchor=W)
 
-    def disableGroup(self):
-        list_widget = self.pack_slaves()
-        for i in list_widget:
-            i.state=DISABLED
-
-class DownloadInfomationUI(Frame):
-
-    def __init__(self, master=None, save='', requests='', params={}):
-        super().__init__(master=master)
-        self.save = save
-        self.request = request
-        self.params = params
-        self.setupUI()
-
-    def setupUI(self):
-
-        progress = Progressbar(self, orient=HORIZONTAL, length=100, mode='determinate')
-        progress.grid(row=0, column=0, columnspan=5,sticky='we')
-        
-        var_progress = StringVar()
-        var_progress.set('0%')
-        label_show_progress = Label(self,textvariable=var_progress, anchor=CENTER)
-        label_show_progress.var = var_progress
-        label_show_progress.grid(row=0, column=5, sticky='we')
-
-        label_query = Label(self,text='Query:')
-        label_query.grid(row=1,column=0, sticky='w')
-
-        entry_query = Entry(self)
-        entry_query.grid(row=1,column=1, sticky='w')
-
-        label_total = Label(self,text='Total:')
-        label_total.grid(row=1,column=2, sticky='w')
-
-        entry_total = Entry(self)
-        entry_total.grid(row=1,column=3, sticky='w')
-
-        label_total_page = Label(self,text='Total pages:')
-        label_total_page.grid(row=1,column=4, sticky='w')
-
-        entry_total_page = Entry(self)
-        entry_total_page.grid(row=1,column=5, sticky='w')
-
-        image_downloaded = PhotoImage(file='icon/folder.png')
-        label_image_downloaded = Label(self,image=image_downloaded)
-        label_image_downloaded.image = image_downloaded
-        label_image_downloaded.grid(row=2,column=0)
-    
-    def download(self):
-        r = requests.get(self.request, params=self.params)
-        if r.status_code == 200:
-            # get urls based on quality
-            j = json.loads(r.text)
-            results = j['results']
-            for i in results:
-                name = i['id']
-                url = i['urls'][self.var_quality_rb]
-                time.sleep(1)
-                request.urlretrieve(self.save, self.path+'/'+name+'.jpg')
-
 
 class DownloadInfomationToplevelWindow(Toplevel):
 
-    def __init__(self, master=None):
+    def __init__(self, master=None, option=()):
         super().__init__(master=master)
         self.master = master
+        self.option = option
         self.setupUI()
 
     def setupUI(self):
         self.title('Download information')
         label_title = Label(self, text='Download information',
                             anchor=CENTER, foreground='white', background='#2c3e50')
-        label_title.pack(fill=X)
+        label_title.grid(row=0,column=0, columnspan=6)
 
-        self.transient()
-        self.grab_set()
+        self.progress = Progressbar(self, orient=HORIZONTAL, length=100, mode='determinate')
+        self.progress.grid(row=0, column=0, columnspan=5,sticky='we')
+        
+        self.var_progress = StringVar()
+        self.var_progress.set('0%')
+        self.label_show_progress = Label(self,textvariable=self.var_progress, anchor=CENTER)
+        self.label_show_progress.var = self.var_progress
+        self.label_show_progress.grid(row=0, column=5, sticky='we')
 
+        self.label_query = Label(self,text='Query:')
+        self.label_query.grid(row=1, column=0, sticky='w')
+
+        self.var_entry_query=StringVar()
+        self.entry_query = Entry(
+            self, textvariable=self.var_entry_query, state='readonly')
+        self.entry_query.grid(row=1, column=1, sticky='w')
+
+        self.label_total = Label(self, text='Total:')
+        self.label_total.grid(row=1, column=2, sticky='w')
+
+        self.var_entry_total = IntVar()
+        self.entry_total = Entry(
+            self, textvariable=self.var_entry_total, state='readonly')
+        self.entry_total.grid(row=1, column=3, sticky='w')
+
+        self.label_total_page = Label(self, text='Total pages:')
+        self.label_total_page.grid(row=1, column=4, sticky='w')
+
+        self.var_entry_total_pages = IntVar()
+        self.entry_total_page = Entry(
+            self, textvariable=self.var_entry_total_pages, state='readonly')
+        self.entry_total_page.grid(row=1, column=5, sticky='w')
+
+        self.label_image_downloaded = Label(self)
+        self.label_image_downloaded.grid(row=2, column=0, columnspan=6, sticky='wesn')
+
+    def download(self):
+        if  self.option[2] == 'https://unsplash.com/napi/search/photos':
+            r = requests.get(self.option[2], params=self.option[3])
+            if r.status_code == 200:
+                # get urls based on quality
+                j = json.loads(r.text)
+                total = j['total']
+                total_pages = j['total_pages']
+                results = j['results']
+
+                self.var_entry_query.set(self.option[3]['query'])
+                self.var_entry_total.set(total)
+                self.var_entry_total_pages.set(total_pages)
+
+                self.entry_query.update_idletasks()
+                self.entry_total.update_idletasks()
+                self.entry_total_page.update_idletasks()
+
+                for i in results:
+                    name = i['id']
+                    url = i['urls'][self.option[1]]
+                    time.sleep(1)
+                    request.urlretrieve(url, self.option[0]+'/'+name+'.jpg')
+                    self.progress['value'] += 100/len(results)
+                    self.var_progress.set('{}%'.format(self.progress['value']))
+
+                    # show image downloaded
+                    image = Image.open(self.option[0]+'/'+name+'.jpg')
+                    self.photo = ImageTk.PhotoImage(image)
+                    self.label_image_downloaded.config(image=self.photo)
+                    self.label_image_downloaded.image = self.photo
+
+                    self.label_image_downloaded.update_idletasks()
+                    self.label_show_progress.update_idletasks()
+                    self.progress.update_idletasks()
+
+                self.message_done = messagebox.showinfo('Info', 'Done')
 
 class UnsplashUI(Frame):
 
@@ -217,31 +225,39 @@ class UnsplashUI(Frame):
         self.var_folder_name.set(dialog_choice_folder)
 
     def check_paramenter_is_valid(self):
-        # choice requests
-        # query empty --> listPhotos
-        if self.var_name.get() != '':
-            pass
         # check valid value
         if os.path.isdir(self.var_folder_name.get()):
-            self.download()
+            self.show_download_info_window()
         else:
             if self.var_folder_name.get() == '':
                 message_please_enter_path = messagebox.showwarning('Warning','Please enter a path, where save images')
             elif os.path.isdir(self.var_folder_name.get()) == False:
                 message_folder_is_not_exist = messagebox.showwarning('Warning','Path is not exist')
             
+    def choice_request(self):
+        if self.var_random == '1':
+            # call random request
+            pass
+        else:
+            if self.var_name.get() == '':
+                # call listPhotos request
+                pass
+            else:
+                # call searchPhoto request
+                request = 'https://unsplash.com/napi/search/photos'
+                params = {'query': self.var_name.get(
+                ), 'page': self.var_page_number.get(), 'per_page': self.var_amount.get()}
+                folder_name = self.var_folder_name.get()
+                quality = self.var_quality_rb.get()
+                return (folder_name,quality,request,params)
 
-    def download(self):
-        download_info_toplevel_window = DownloadInfomationToplevelWindow(self)
-        download_info_ui = DownloadInfomationUI(download_info_toplevel_window,save=self.var_folder_name)
-        download_info_ui.pack()
+    def show_download_info_window(self):
+        download_info = DownloadInfomationToplevelWindow(master=self.master,option=self.choice_request())
+        self.master.after(1000,download_info.download)
 
-        
-def main_DownloadInformationUI():
-    master = Tk()
-    ui = DownloadInfomationUI(master)
-    ui.pack()
-    master.mainloop()
+        download_info.transient(self.master)
+        download_info.grab_set()
+        self.master.wait_window(download_info)
 
 
 def main_UnsplashUI():
