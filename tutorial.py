@@ -1,67 +1,32 @@
-# importing tkinter module
-from time import sleep
-import tkinter
-# from tkinter import * 
-# from tkinter.ttk import *
-
-# # creating tkinter window
-# root = Tk()
-
-# # Progress bar widget
-# progress = Progressbar(root, orient=HORIZONTAL,
-#                        length=100, mode='determinate')
-
-# # Function responsible for the updation
-# # of the progress bar value
+import tkinter as tk
 
 
-# def bar():
-#     import time
-#     progress['value'] = 20
-#     root.update_idletasks()
-#     time.sleep(1)
+class window2:
+    def __init__(self, master1):
+        self.panel2 = tk.Frame(master1)
+        self.panel2.grid()
+        self.button2 = tk.Button(
+            self.panel2, text="Quit", command=self.panel2.quit)
+        self.button2.grid()
+        vcmd = (master1.register(self.validate),
+                '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
+        self.text1 = tk.Entry(self.panel2, validate='key',
+                              validatecommand=vcmd)
+        self.text1.grid()
+        self.text1.focus()
 
-#     progress['value'] = 40
-#     root.update_idletasks()
-#     time.sleep(1)
-
-#     progress['value'] = 50
-#     root.update_idletasks()
-#     time.sleep(1)
-
-#     progress['value'] = 60
-#     root.update_idletasks()
-#     time.sleep(1)
-
-#     progress['value'] = 80
-#     root.update_idletasks()
-#     time.sleep(1)
-#     progress['value'] = 100
-
-
-# progress.pack(pady=10)
-
-# Button(root, text='Start', command=bar).pack(pady=10)
-
-# mainloop()
+    def validate(self, action, index, value_if_allowed,
+                 prior_value, text, validation_type, trigger_type, widget_name):
+        if value_if_allowed:
+            try:
+                float(value_if_allowed)
+                return True
+            except ValueError:
+                return False
+        else:
+            return False
 
 
-main = tkinter.Tk()
-txt = tkinter.Text(main)
-txt.grid()
-
-
-def update_txt(event=None):
-    vals = ['This is some text.',
-            'This is some more.',
-            'Blah blah blah']
-    i = 0
-    while i < len(vals):
-        txt.delete('1.0', 'end')
-        txt.insert('1.0', vals[i])
-        txt.update_idletasks()
-        sleep(2)
-        i = i+1
-
-main.after(1000, update_txt)
-main.mainloop()
+root1 = tk.Tk()
+window2(root1)
+root1.mainloop()
