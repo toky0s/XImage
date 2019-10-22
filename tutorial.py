@@ -1,5 +1,6 @@
 import tkinter as tk
 
+from tkinter import StringVar, Label
 
 class window2:
     def __init__(self, master1):
@@ -26,7 +27,3 @@ class window2:
         else:
             return False
 
-
-root1 = tk.Tk()
-window2(root1)
-root1.mainloop()

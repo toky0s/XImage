@@ -1,22 +1,12 @@
-# from tkinter import filedialog, messagebox
-# # from tkinter import *
-# from tkinter.ttk import *
-# from urllib import request
-# from PIL import Image, ImageTk
-
 from CallTipWindow import createToolTip
 from frame_download import FrameDownload
-
-import os
-import requests
-import json
-import time
 
 from tkinter import messagebox, filedialog, StringVar, IntVar, PhotoImage, Tk, Toplevel
 from tkinter.ttk import Label, Progressbar, Entry, Frame, Radiobutton, Button, Checkbutton
 from PIL import Image, ImageTk
 from urllib import request
 
+import os
 import json
 import time
 import requests
@@ -101,9 +91,10 @@ class UnsplashUI(Frame):
 
         QUALITIES = {
             'Raw': 'raw',
+            'Full':'full',
             'Regular': 'regular',
             'Small': 'small',
-            'Thumnail': 'thumnail',
+            'Thumnail': 'thumb',
         }
 
         self.var_quality_rb = StringVar()
@@ -179,16 +170,18 @@ class UnsplashUI(Frame):
         else:
             if self.var_name.get() == '':
                 request = 'https://unsplash.com/napi/photos'
-                params = params = {'query': self.var_name.get(),
-                    'page': self.var_page_number.get(), 'per_page': self.var_amount.get()}
+                params = params = {'page': self.var_page_number.get(), 'per_page': self.var_amount.get()}
                 folder_name = self.var_folder_name.get()
                 quality = self.var_quality_rb.get()
                 return (folder_name, quality, request, params)
             else:
                 # call searchPhoto request
                 request = 'https://unsplash.com/napi/search/photos'
-                params = {'query': self.var_name.get(
-                ), 'page': self.var_page_number.get(), 'per_page': self.var_amount.get()}
+                params = {
+                    'query': self.var_name.get(),
+                    'page': self.var_page_number.get(),
+                    'per_page': self.var_amount.get()
+                    }
                 folder_name = self.var_folder_name.get()
                 quality = self.var_quality_rb.get()
                 return (folder_name, quality, request, params)
@@ -197,19 +190,17 @@ class UnsplashUI(Frame):
         download_info = DownloadInfomation(
             master=self.master, option=self.choice_request())
 
-        self.after(100, download_info.frame.change_ui)
+        download_info.after(100, download_info.frame.change_ui)
 
-        download_info.transient(self.master)
-        download_info.grab_set()
-        self.master.wait_window(download_info)
+        # download_info.transient(self.master)
+        # download_info.grab_set()
+        # self.master.wait_window(download_info)
+
+        # fix bug render toplevel when active it or it's parent widget
 
 
-def main_UnsplashUI():
+if __name__ == '__main__':
     master = Tk()
     ui = UnsplashUI(master)
     ui.pack()
     master.mainloop()
-
-
-if __name__ == '__main__':
-    main_UnsplashUI()

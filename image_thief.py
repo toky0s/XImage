@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter.ttk import *
 from unsplash_ui import UnsplashUI
-
+from graphicriver_ui import GraphicRiverUI
 
 class MyApp(Frame):
 
@@ -20,12 +20,16 @@ class MyApp(Frame):
         frame_group_option.grid(row=0,column=0)
 
         self.var_frame_group_option = IntVar()
-        self.var_frame_group_option.set(1)
+        self.var_frame_group_option.set(1) # set UI for app
 
         icon_unsplash = PhotoImage(file='icon/photo-camera.png')
         radiobutton_unsplash_ui = Radiobutton(
-            frame_group_option, text='Unsplash', image=icon_unsplash,variable=self.var_frame_group_option, value=1, command=self.set_ui, compound=LEFT)
+            frame_group_option, text='Unsplash',
+            image=icon_unsplash,
+            variable=self.var_frame_group_option,
+            value=1, command=self.set_ui, compound=LEFT)
         radiobutton_unsplash_ui.image = icon_unsplash
+        
         radiobutton_graphicriver_ui = Radiobutton(
             frame_group_option, text='GraphicRiver', variable=self.var_frame_group_option, value=2, command=self.set_ui)
 
@@ -40,12 +44,12 @@ class MyApp(Frame):
         if self.var_frame_group_option.get() == 1:
             list_app[0].destroy()
             self.unsplash_ui = UnsplashUI(self)
-            self.unsplash_ui.grid(row=1, column=0, sticky=W)
+            self.unsplash_ui.grid(row=1, column=0)
 
         elif self.var_frame_group_option.get() == 2:
             list_app[0].destroy()
-            l = Label(self,text='at here is graphicriver')
-            l.grid(row=1, column=0)
+            self.graphicriver_ui = GraphicRiverUI(self)
+            self.graphicriver_ui.grid(row=1, column=0)
 
 
 if __name__ == '__main__':
