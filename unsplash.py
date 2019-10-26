@@ -110,19 +110,20 @@ class GraphicRiver:
             os.mkdir(self.path)
 
     def __has_a_http_jpg(self, tag):
-        # check image's link is https://www.somthing.jpg
-        if (tag['class'] == 'is-hidden') and (tag.name == 'a') and (('.jpg' == tag['href'][-4:len(tag['href'])])or('.JPG' == tag['href'][-4:len(tag['href'])])):
+        # dont use, because it have a error, which i can not identify
+        if tag['class'] == "is-hidden" and tag.name == 'a' and (('.jpg' == tag['href'][-4:len(tag['href'])])or('.JPG' == tag['href'][-4:len(tag['href'])])):
             return True
 
     def getUrls(self, url):
         r = requests.get(url)
         if r.status_code == 200:
             soup = BeautifulSoup(r.text, 'lxml')
-            list_tag_a = soup.find_all(
-                self.__has_a_http_jpg)  # get link to download
+            # get link to download
+            div = soup.find(class_= 'js- item-preview-image__gallery')
+            soup = BeautifulSoup(str(div),'lxml')
+            list_tag_a = soup.find_all('a')
             for i in list_tag_a:
                 self.listUrls.append(i['href'])
-            return len(list_tag_a)
 
     def download(self, how_much, wait_time=0):
         check = 0
@@ -136,6 +137,7 @@ class GraphicRiver:
         return check
 
 if __name__ == '__main__':
-    a = Unsplash('Cats')
-    a.searchPhotos('cat')
-    a.download()
+    a = GraphicRiver('xin')
+    a.getUrls(
+        'https://graphicriver.net/item/verzus-minimal-powerpoint-template/18127423')
+    a.download(10)
