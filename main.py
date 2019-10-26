@@ -11,6 +11,7 @@ import os
 import json
 import requests
 import time
+import shutil
 
 # unsplash
 
@@ -34,11 +35,6 @@ class FrameGroupRadiobutton(Frame):
             radiobt_quality.pack(side=self.side, anchor='w')
 
 
-LIST = 'https://unsplash.com/napi/photos'
-RANDOM = 'https://unsplash.com/napi/photos/random'
-SEARCH = 'https://unsplash.com/napi/search/photos'
-
-
 class FrameDownload(Frame):
 
     def __init__(self, master=None, option=()):
@@ -46,11 +42,14 @@ class FrameDownload(Frame):
         self.master = master
         self.master.title('Download information')
         self.option = option
+        self.LIST = 'https://unsplash.com/napi/photos'
+        self.RANDOM = 'https://unsplash.com/napi/photos/random'
+        self.SEARCH = 'https://unsplash.com/napi/search/photos'
         self.setupUI()
 
     def setupUI(self):
         # build UI base on URLS
-        if self.option[2] == SEARCH:
+        if self.option[2] == self.SEARCH:
             # title window
             label_title = Label(self, text='Search Photos')
             label_title.config(
@@ -110,7 +109,7 @@ class FrameDownload(Frame):
 
             # self.change_ui()
 
-        elif self.option[2] == LIST:
+        elif self.option[2] == self.LIST:
             # title window
             label_title = Label(self, text='List of Photos')
             label_title.config(
@@ -156,7 +155,7 @@ class FrameDownload(Frame):
 
             # self.change_ui()
 
-        elif self.option[2] == RANDOM:
+        elif self.option[2] == self.RANDOM:
             # title window
             label_title = Label(self, text='Random Photos')
             label_title.config(
@@ -206,7 +205,7 @@ class FrameDownload(Frame):
                 row=3, column=0, columnspan=4, sticky='wesn')
 
     def change_ui(self):
-        if self.option[2] == SEARCH:
+        if self.option[2] == self.SEARCH:
             r = requests.get(self.option[2], params=self.option[3])
             if r.status_code == 200:
                 # get urls based on quality
@@ -224,7 +223,7 @@ class FrameDownload(Frame):
                 self.entry_total_page.update_idletasks()
 
         # random photos
-        elif self.option[2] == RANDOM:
+        elif self.option[2] == self.RANDOM:
             r = requests.get(self.option[2], params=self.option[3])
             if r.status_code == 200:
 
@@ -232,7 +231,7 @@ class FrameDownload(Frame):
                 j = json.loads(r.text)
                 results = j
 
-        elif self.option[2] == LIST:
+        elif self.option[2] == self.LIST:
             r = requests.get(self.option[2], params=self.option[3])
             if r.status_code == 200:
 
@@ -610,11 +609,6 @@ class FrameUserManual(Frame):
         self.label_title = Label(self, text='Usage')
         self.label_title.pack()
 
-
-# class GraphicRiverEdit(GraphicRiver):
-
-#     def __init__(self, folder_path):
-#         self.path = folder_path
 
 
 class MyApp(Frame):
