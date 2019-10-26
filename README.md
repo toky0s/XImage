@@ -1,2 +1,2 @@
-# downloadImage
-Interface to get image from Unsplash, GraphicRiver
+# Image Thief
+Interface to download image from Unsplash, GraphicRiver
