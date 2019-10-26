@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter.ttk import *
 from unsplash_ui import UnsplashUI
 from graphicriver_ui import GraphicRiverUI
+from PIL import Image, ImageTk
 
 class MyApp(Frame):
 
@@ -11,8 +12,8 @@ class MyApp(Frame):
         self.master.title('Image Thief')
         self.master.iconbitmap('icon/bandit.ico')
         title_app = Label(self.master, text='Image Thief',
-                          background='#229954', foreground='white', anchor=CENTER)
-        title_app.pack(fill=X)
+                          background='#229954', foreground='white', anchor='center')
+        title_app.pack(fill='x')
         self.setupUI()
 
     def setupUI(self):
@@ -27,17 +28,24 @@ class MyApp(Frame):
             frame_group_option, text='Unsplash',
             image=icon_unsplash,
             variable=self.var_frame_group_option,
-            value=1, command=self.set_ui, compound=LEFT)
+            value=1, command=self.set_ui, compound='left')
         radiobutton_unsplash_ui.image = icon_unsplash
         
-        radiobutton_graphicriver_ui = Radiobutton(
-            frame_group_option, text='GraphicRiver', variable=self.var_frame_group_option, value=2, command=self.set_ui)
+        # icon_graphicriver = PhotoImage(file='icon/graphicriver.png')
+        radiobutton_graphicriver_ui = Radiobutton(frame_group_option,
+            text='GraphicRiver',
+            # image = icon_graphicriver,
+            compound='left',
+            variable=self.var_frame_group_option,
+            value=2,
+            command=self.set_ui)
+        # radiobutton_graphicriver_ui.image = icon_graphicriver
 
-        radiobutton_unsplash_ui.pack(side=LEFT)
-        radiobutton_graphicriver_ui.pack(side=LEFT)
+        radiobutton_unsplash_ui.pack(side='left')
+        radiobutton_graphicriver_ui.pack(side='left')
 
         self.unsplash_ui = UnsplashUI(self)
-        self.unsplash_ui.grid(row=1, column=0, sticky=W)
+        self.unsplash_ui.grid(row=1, column=0, sticky='w')
 
     def set_ui(self):
         list_app = self.grid_slaves(row=1,column=0)
