@@ -550,46 +550,26 @@ class GraphicRiverUI(Frame):
         full_path_save = self.var_folder_name.get()+'/'+dir_name
         os.mkdir(full_path_save)
 
-        # check amount here
-        if self.var_amount.get() == 0 and self.var_amount.get() > len(self.list_tag_a):
-            # download all
-            # for i in self.get_list_tag_a(self, self.var_url):
-            #     name_image = i.split('/')[6]
-            #     request.urlretrieve(i, full_path_save+'/'+image_names)
+        per = 0
+        for i in self.list_tag_a:
+            name_image = i.split('/')[-1]
+            request.urlretrieve(i, full_path_save+'/'+name_image)
 
-            #     image_downloaded = Image.open(
-            #         file=self.var_folder_name.get()+'/'+image_names)
-            #     width = int(self.winfo_width())
-            #     height = int(width*image_downloaded.height /
-            #                  image_downloaded.width)
+            image_downloaded = Image.open(full_path_save+'/'+name_image)
+            width = int(self.winfo_width())
+            height = int(width*image_downloaded.height /
+                         image_downloaded.width)
 
-            #     self.photo = ImageTk.PhotoImage(
-            #         image_downloaded.resize((width, height), Image.ANTIALIAS))
-            #     self.label_image.config(image=self.photo)
-            #     self.label_image.image = self.photo
-            #     self.var_progress.set('{}%'.format())
-            print('main line 572: FIXME')
-        else:
-            per = 0
-            for i in self.list_tag_a:
-                name_image = i.split('/')[-1]
-                request.urlretrieve(i, full_path_save+'/'+name_image)
+            image_complete = ImageTk.PhotoImage(
+                image_downloaded.resize((width, height), Image.ANTIALIAS))
+            self.label_image.config(image=image_complete)
+            self.label_image.image = image_complete
 
-                image_downloaded = Image.open(full_path_save+'/'+name_image)
-                width = int(self.winfo_width())
-                height = int(width*image_downloaded.height /
-                             image_downloaded.width)
+            per = per + 100/self.var_amount.get()
+            self.var_progress.set('{}%'.format(per))
+            self.progress_bar['value'] += per
 
-                image_complete = ImageTk.PhotoImage(
-                    image_downloaded.resize((width, height), Image.ANTIALIAS))
-                self.label_image.config(image=image_complete)
-                self.label_image.image = image_complete
-
-                per = per + 100/self.var_amount.get()
-                self.var_progress.set('{}%'.format(per))
-                self.progress_bar['value'] += per
-
-                self.progress_bar.update_idletasks()
+            self.progress_bar.update_idletasks()
 
     def show_user_manual(self):
         # User manual
@@ -606,9 +586,15 @@ class FrameUserManual(Frame):
         self.setupUI()
 
     def setupUI(self):
-        self.label_title = Label(self, text='Usage')
-        self.label_title.pack()
+        self.label_title = Label(
+            self.master, text='Usage', background='#8854d0', anchor='center')
+        self.label_title.pack(fill='x')
 
+        self.image_graphicriver = ImageTk.PhotoImage(file='image/graphicriver.png')
+        self.text = 'Copy path of a template, and paste it into this entry'
+        self.label_text = Label(self.master, text=self.text, image = self.image_graphicriver,compound='left')
+        self.label_text.image = self.image_graphicriver
+        self.label_text.pack()
 
 
 class MyApp(Frame):
@@ -638,15 +624,15 @@ class MyApp(Frame):
             value=1, command=self.set_ui, compound='left')
         radiobutton_unsplash_ui.image = icon_unsplash
 
-        # icon_graphicriver = PhotoImage(file='icon/graphicriver.png')
-        radiobutton_graphicriver_ui = Radiobutton(frame_group_option,
-                                                  text='GraphicRiver',
-                                                  # image = icon_graphicriver,
-                                                  compound='left',
-                                                  variable=self.var_frame_group_option,
-                                                  value=2,
-                                                  command=self.set_ui)
-        # radiobutton_graphicriver_ui.image = icon_graphicriver
+        icon_graphicriver = ImageTk.PhotoImage(file='icon/graphicriver.png')
+        radiobutton_graphicriver_ui = Radiobutton(frame_group_option)
+        radiobutton_graphicriver_ui['text'] = 'GraphicRiver'
+        radiobutton_graphicriver_ui['image'] = icon_graphicriver
+        radiobutton_graphicriver_ui.image = icon_graphicriver
+        radiobutton_graphicriver_ui['compound'] = 'left'
+        radiobutton_graphicriver_ui['variable'] = self.var_frame_group_option
+        radiobutton_graphicriver_ui['value'] = 2
+        radiobutton_graphicriver_ui['command'] = self.set_ui
 
         radiobutton_unsplash_ui.pack(side='left')
         radiobutton_graphicriver_ui.pack(side='left')
