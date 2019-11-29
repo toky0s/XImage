@@ -1,8 +1,8 @@
 # complete code here
 from CallTipWindow import createToolTip
 
-from tkinter import messagebox, filedialog, StringVar, IntVar, PhotoImage, Tk, Toplevel
-from tkinter.ttk import Label, Progressbar, Entry, Frame, Radiobutton, Button, Checkbutton
+from tkinter import messagebox, filedialog, StringVar, IntVar, PhotoImage, Tk, Toplevel, Text, Canvas
+from tkinter.ttk import Label, Progressbar, Entry, Frame, Radiobutton, Button, Checkbutton, Scrollbar
 from PIL import Image, ImageTk
 from urllib import request
 from bs4 import BeautifulSoup
@@ -10,10 +10,50 @@ from bs4 import BeautifulSoup
 import os
 import json
 import requests
+import urllib.request
 import time
 import shutil
+import threading
+
 
 # unsplash
+class UnsplashImage:
+
+    def __init__(self, data):
+        self.id = data['id']
+        self.alt_description = data['alt_description']
+        self.raw = data['urls']['raw']
+        self.full = data['urls']['full']
+        self.regular = data['urls']['regular']
+        self.small = data['urls']['small']
+        self.thumb = data['urls']['thumb']
+
+    def getRawUrl(self):
+        return self.raw
+
+    def getFullUrl(self):
+        return self.full
+
+    def getRegularUrl(self):
+        return self.regular
+
+    def getSmallUrl(self):
+        return self.small
+
+    def getThumbUrl(self):
+        return self.thumb
+
+    def downloadThisImage(self, quality: str, save_at: str, **kw):
+        quality_dict = {
+            'raw': self.getRawUrl,
+            'full': self.getFullUrl,
+            'regular': self.getRegularUrl,
+            'small': self.getSmallUrl,
+            'thumb': self.getThumbUrl
+        }
+        link = quality_dict[quality]()
+        urllib.request.urlretrieve(link, f'{save_at}/{self.id}.jpg')
+        return f'{save_at}/{self.id}.jpg'
 
 
 class FrameGroupRadiobutton(Frame):
@@ -35,256 +75,12 @@ class FrameGroupRadiobutton(Frame):
             radiobt_quality.pack(side=self.side, anchor='w')
 
 
-class FrameDownload(Frame):
-
-    def __init__(self, master=None, option=()):
-        super().__init__(master=master)
-        self.master = master
-        self.master.title('Download information')
-        self.option = option
-        self.LIST = 'https://unsplash.com/napi/photos'
-        self.RANDOM = 'https://unsplash.com/napi/photos/random'
-        self.SEARCH = 'https://unsplash.com/napi/search/photos'
-        self.setupUI()
-
-    def setupUI(self):
-        # build UI base on URLS
-        if self.option[2] == self.SEARCH:
-            # title window
-            label_title = Label(self, text='Search Photos')
-            label_title.config(
-                anchor='center', foreground='white', background='#8e44ad')
-            label_title.grid(row=0, column=0, columnspan=6, sticky='we')
-
-            # progress
-            self.progress = Progressbar(self)
-            self.progress.config(orient='horizontal',
-                                 length=100, mode='determinate')
-            self.progress.grid(row=2, column=0, columnspan=5, sticky='we')
-
-            self.var_progress = StringVar()
-            self.var_progress.set('0%')
-            self.label_show_progress = Label(self)
-            self.label_show_progress.config(
-                textvariable=self.var_progress, anchor='center')
-            self.label_show_progress.var = self.var_progress
-            self.label_show_progress.grid(row=2, column=5, sticky='w')
-
-            # query
-            self.label_query = Label(self, text='Query')
-            self.label_query.grid(row=1, column=0, sticky='e')
-
-            self.var_entry_query = StringVar()
-            self.entry_query = Entry(self)
-            self.entry_query.config(
-                textvariable=self.var_entry_query, state='readonly')
-            self.entry_query.grid(row=1, column=1, sticky='w')
-
-            # total
-            self.var_total = StringVar()
-            self.var_total.set('Total')
-            self.label_total = Label(self, textvariable=self.var_total)
-            self.label_total.grid(row=1, column=2, sticky='e')
-
-            self.var_entry_total = IntVar()
-            self.entry_total = Entry(self)
-            self.entry_total.config(
-                textvariable=self.var_entry_total, state='readonly')
-            self.entry_total.grid(row=1, column=3, sticky='w')
-
-            # total pages
-            self.label_total_page = Label(self, text='Total pages:')
-            self.label_total_page.grid(row=1, column=4, sticky='e')
-
-            self.var_entry_total_pages = IntVar()
-            self.entry_total_page = Entry(self)
-            self.entry_total_page.config(
-                textvariable=self.var_entry_total_pages, state='readonly')
-            self.entry_total_page.grid(row=1, column=5, sticky='w')
-
-            # show image is downloaded
-            self.label_image_downloaded = Label(self, anchor='center')
-            self.label_image_downloaded.grid(
-                row=3, column=0, columnspan=6, sticky='wesn')
-
-            # self.change_ui()
-
-        elif self.option[2] == self.LIST:
-            # title window
-            label_title = Label(self, text='List of Photos')
-            label_title.config(
-                anchor='center', foreground='white', background='#2c3e50')
-            label_title.grid(row=0, column=0, columnspan=4, sticky='we')
-
-            # progress
-            self.progress = Progressbar(self)
-            self.progress.config(orient='horizontal',
-                                 length=100, mode='determinate')
-            self.progress.grid(row=2, column=0, columnspan=3, sticky='we')
-
-            self.var_progress = StringVar()
-            self.var_progress.set('0%')
-            self.label_show_progress = Label(self)
-            self.label_show_progress.config(
-                textvariable=self.var_progress, anchor='center')
-            self.label_show_progress.var = self.var_progress
-            self.label_show_progress.grid(row=2, column=3, sticky='w')
-
-            # query
-            self.label_query = Label(self, text='Query:')
-            self.label_query.grid(row=1, column=0, sticky='e')
-
-            self.entry_query = Entry(self)
-            self.entry_query.insert(0, 'LIST')
-            self.entry_query.config(state='readonly')
-            self.entry_query.grid(row=1, column=1, sticky='w')
-
-            # amount
-            self.label_total = Label(self, text='Amount:')
-            self.label_total.grid(row=1, column=2, sticky='e')
-
-            self.entry_total = Entry(self)
-            self.entry_total.insert(0, self.option[3]['per_page'])
-            self.entry_total.config(state='readonly')
-            self.entry_total.grid(row=1, column=3, sticky='w')
-
-            # show image is downloaded
-            self.label_image_downloaded = Label(self, anchor='center')
-            self.label_image_downloaded.grid(
-                row=3, column=0, columnspan=4, sticky='wesn')
-
-            # self.change_ui()
-
-        elif self.option[2] == self.RANDOM:
-            # title window
-            label_title = Label(self, text='Random Photos')
-            label_title.config(
-                anchor='center', foreground='white', background='#16a085')
-            label_title.grid(row=0, column=0, columnspan=4, sticky='we')
-
-            # progress
-            self.progress = Progressbar(self)
-            self.progress.config(orient='horizontal',
-                                 length=100, mode='determinate')
-            self.progress.grid(row=2, column=0, columnspan=3, sticky='we')
-
-            self.var_progress = StringVar()
-            self.var_progress.set('0%')
-            self.label_show_progress = Label(self)
-            self.label_show_progress.config(
-                textvariable=self.var_progress, anchor='center')
-            self.label_show_progress.var = self.var_progress
-            self.label_show_progress.grid(row=2, column=3, sticky='w')
-
-            # query
-            self.label_query = Label(self, text='Query')
-            self.label_query.grid(row=1, column=0, sticky='e')
-
-            self.entry_query = Entry(self)
-            self.entry_query.insert(0, 'RANDOM')
-            self.entry_query.config(state='readonly')
-            self.entry_query.grid(row=1, column=1, sticky='w')
-
-            # amount
-            self.label_total = Label(self, text='Amount')
-            self.label_total.grid(row=1, column=2, sticky='e')
-
-            self.var_entry_total = IntVar()
-            if self.option[3]['count'] > 30:
-                self.var_entry_total.set(30)
-            else:
-                self.var_entry_total.set(self.option[3]['count'])
-            self.entry_total = Entry(self)
-            self.entry_total.config(
-                textvariable=self.var_entry_total, state='readonly')
-            self.entry_total.grid(row=1, column=3, sticky='w')
-
-            # show image is downloaded
-            self.label_image_downloaded = Label(self, anchor='center')
-            self.label_image_downloaded.grid(
-                row=3, column=0, columnspan=4, sticky='wesn')
-
-    def change_ui(self):
-        if self.option[2] == self.SEARCH:
-            r = requests.get(self.option[2], params=self.option[3])
-            if r.status_code == 200:
-                # get urls based on quality
-                j = json.loads(r.text)
-                total = j['total']
-                total_pages = j['total_pages']
-                results = j['results']
-
-                self.var_entry_query.set(self.option[3]['query'])
-                self.var_entry_total.set(total)
-                self.var_entry_total_pages.set(total_pages)
-
-                self.entry_query.update_idletasks()
-                self.entry_total.update_idletasks()
-                self.entry_total_page.update_idletasks()
-
-        # random photos
-        elif self.option[2] == self.RANDOM:
-            r = requests.get(self.option[2], params=self.option[3])
-            if r.status_code == 200:
-
-                # get result
-                j = json.loads(r.text)
-                results = j
-
-        elif self.option[2] == self.LIST:
-            r = requests.get(self.option[2], params=self.option[3])
-            if r.status_code == 200:
-
-                # get result
-                j = json.loads(r.text)
-                results = j
-
-        self.download(results)
-
-    def download(self, results):
-        for i in results:
-            name = i['id']
-            url = i['urls'][self.option[1]]
-            time.sleep(1)  # delay time to send request
-            try:
-                request.urlretrieve(url, self.option[0]+'/'+name+'.jpg')
-            except Exception as x:  # re download if have a problem
-                print('have problem', x)
-                time.sleep(1)
-
-            self.progress['value'] += 100/len(results)
-            self.var_progress.set('{}%'.format(self.progress['value']))
-
-            # show image downloaded
-            image = Image.open(self.option[0]+'/'+name+'.jpg')
-            width = int(self.winfo_width())
-            height = int(width*image.height/image.width)
-            self.photo = ImageTk.PhotoImage(
-                image.resize((width, height), Image.ANTIALIAS))
-            self.label_image_downloaded.config(image=self.photo)
-            self.label_image_downloaded.image = self.photo
-
-            self.progress.update_idletasks()
-
-        self.message_done = messagebox.showinfo('Info', 'Done')
-        self.master.destroy()
-
-
-class DownloadInfomation(Toplevel):
-
-    def __init__(self, master=None, option=()):
-        super().__init__(master=master)
-        self.master = master
-        self.option = option
-        self.frame = FrameDownload(self, self.option)
-        self.frame.pack()
-
-
 class UnsplashUI(Frame):
 
     def __init__(self, master=None):
         super().__init__(master=master)
         self.master = master
+        self.listUnsplashImage = []
         self.setupUI()
 
     def setupUI(self):
@@ -297,17 +93,17 @@ class UnsplashUI(Frame):
         self.label_page_number = Label(self, text='Page:')
         self.label_page_number.grid(row=2, column=0, sticky='w')
 
-        label_save = Label(self, text='Save:')
-        label_save.grid(row=3, column=0, sticky='w')
+        self.label_save = Label(self, text='Save:')
+        self.label_save.grid(row=3, column=0, sticky='w')
 
-        label_quality = Label(self, text='Quality:')
-        label_quality.grid(row=4, column=0, sticky='w')
+        self.label_quality = Label(self, text='Quality:')
+        self.label_quality.grid(row=4, column=0, sticky='w')
 
         self.label_order_by = Label(self, text='Order by:')
         self.label_order_by.grid(row=5, column=0, sticky='w')
 
-        label_random = Label(self, text='Random:')
-        label_random.grid(row=6, column=0, sticky='w')
+        self.label_random = Label(self, text='Random:')
+        self.label_random.grid(row=6, column=0, sticky='w')
 
         self.var_name = StringVar()
         self.entry_name = Entry(self, textvariable=self.var_name)
@@ -324,11 +120,12 @@ class UnsplashUI(Frame):
         self.entry_page_number.grid(row=2, column=1, sticky='we')
 
         self.var_folder_name = StringVar()
-        entry_save = Entry(self, textvariable=self.var_folder_name)
-        entry_save.grid(row=3, column=1, sticky='we')
+        self.entry_save = Entry(self, textvariable=self.var_folder_name)
+        self.entry_save.grid(row=3, column=1, sticky='we')
 
-        button_browse = Button(self, text='Browse', command=self.choice_folder)
-        button_browse.grid(row=3, column=2, sticky='we')
+        self.button_browse = Button(
+            self, text='Browse', command=self.choice_folder)
+        self.button_browse.grid(row=3, column=2, sticky='we')
 
         QUALITIES = {
             'Raw': 'raw',
@@ -355,16 +152,47 @@ class UnsplashUI(Frame):
         self.group_order_by_radiobutton.grid(row=5, column=1, sticky='w')
 
         self.var_random = IntVar()
-        checkbutton_random = Checkbutton(
-            self, variable=self.var_random, command=self.disable_order_by_for_random)
-        checkbutton_random.grid(row=6, column=1, sticky='w')
-        createToolTip(checkbutton_random, 'Max amount is 30')
+        self.checkbutton_random = Checkbutton(self)
+        self.checkbutton_random['variable'] = self.var_random
+        self.checkbutton_random['command'] = self.disable_order_by_for_random
+        self.checkbutton_random.grid(row=6, column=1, sticky='w')
+        createToolTip(self.checkbutton_random, 'Max amount is 30')
 
-        image_icon_download = PhotoImage(file='icon/down-arrow.png')
-        button_download = Button(self, text='Download now!', image=image_icon_download,
-                                 compound='left', command=self.check_paramenter_is_valid)
-        button_download.image = image_icon_download
-        button_download.grid(row=7, column=1)
+        self.image_icon_download = PhotoImage(file='icon/down-arrow.png')
+        self.button_download = Button(self)
+        self.button_download['text'] = 'Download now!'
+        self.button_download['image'] = self.image_icon_download
+        self.button_download['compound'] = 'left'
+        self.button_download['command'] = self.startDownload
+        self.button_download.image = self.image_icon_download
+        self.button_download.grid(row=7, column=1)
+
+        self.text_infor = Text(self)
+        self.text_infor['width'] = 50
+        self.text_infor['height'] = 12
+        self.text_infor['bg'] = '#0a3d62'
+        self.text_infor['fg'] = 'white'
+        self.text_infor.grid(row=8, column=0, columnspan=3)
+
+    def startDownload(self):
+        # check folder
+        if self.var_folder_name.get() == '':
+            messagebox.showwarning('Thông báo','Bạn chưa chọn nơi lưu trữ!')
+            return
+        else:
+            self.text_infor.delete(1.0,'end')
+            self.lock = threading.Lock()
+            self.th_sendRequest = threading.Thread(target=self.getListUnsplashImages)
+            self.th_sendRequest.start()
+            self.th_download = threading.Thread(target=self.download)
+            self.th_download.start()
+
+    def download(self):
+        self.lock.acquire()
+        for image in self.listUnsplashImage:
+            i = image.downloadThisImage(self.var_quality_rb.get(),self.var_folder_name.get())
+            self.text_infor.insert('end',f'--> {i}\n')
+        self.lock.release()
 
     def disable_order_by_for_random(self):
         if self.var_random.get() == 1:
@@ -388,57 +216,43 @@ class UnsplashUI(Frame):
         dialog_choice_folder = filedialog.askdirectory()
         self.var_folder_name.set(dialog_choice_folder)
 
-    def check_paramenter_is_valid(self):
-        # check valid value
-        if os.path.isdir(self.var_folder_name.get()):
-            self.show_download_info_window()
-        else:
-            if self.var_folder_name.get() == '':
-                message_please_enter_path = messagebox.showwarning(
-                    'Warning', 'Please enter a path, where save images')
-            elif os.path.isdir(self.var_folder_name.get()) == False:
-                message_folder_is_not_exist = messagebox.showwarning(
-                    'Warning', 'Path is not exist')
-
-    def choice_request(self):
+    def getListUnsplashImages(self):
+        '''Thực hiện gửi chọn và request, sau đó đưa data lấy về thành một list chứa UnsplashImage'''
+        self.lock.acquire()
         if self.var_random.get() == 1:
             # call random request
             request = 'https://unsplash.com/napi/photos/random'
             params = {'count': self.var_amount.get()}
-            folder_name = self.var_folder_name.get()
-            quality = self.var_quality_rb.get()
-            return (folder_name, quality, request, params)
+            r = requests.get(request, params=params)
+            self.text_infor.insert('end',f'status code: {r.status_code}\n')
+            data = json.loads(r.text)
+        elif self.var_name.get() == '':
+            request = 'https://unsplash.com/napi/photos'
+            params = params = {
+                'page': self.var_page_number.get(),
+                'per_page': self.var_amount.get()
+            }
+            r = requests.get(request, params=params)
+            self.text_infor.insert('end',f'status code: {r.status_code}\n')
+            data = json.loads(r.text)
         else:
-            if self.var_name.get() == '':
-                request = 'https://unsplash.com/napi/photos'
-                params = params = {
-                    'page': self.var_page_number.get(), 'per_page': self.var_amount.get()}
-                folder_name = self.var_folder_name.get()
-                quality = self.var_quality_rb.get()
-                return (folder_name, quality, request, params)
-            else:
-                # call searchPhoto request
-                request = 'https://unsplash.com/napi/search/photos'
-                params = {
-                    'query': self.var_name.get(),
-                    'page': self.var_page_number.get(),
-                    'per_page': self.var_amount.get()
-                }
-                folder_name = self.var_folder_name.get()
-                quality = self.var_quality_rb.get()
-                return (folder_name, quality, request, params)
+            # call searchPhoto request
+            request = 'https://unsplash.com/napi/search/photos'
+            params = {
+                'query': self.var_name.get(),
+                'page': self.var_page_number.get(),
+                'per_page': self.var_amount.get()
+            }
+            r = requests.get(request, params=params)
+            data = json.loads(r.text)
+            data = data['results']
+            self.text_infor.insert('end',f'status code: {r.status_code}\n')
 
-    def show_download_info_window(self):
-        download_info = DownloadInfomation(
-            master=self.master, option=self.choice_request())
+        for i in data:
+            img = UnsplashImage(i)
+            self.listUnsplashImage.append(img)
 
-        download_info.after(100, download_info.frame.change_ui)
-
-        # download_info.transient(self.master)
-        # download_info.grab_set()
-        # self.master.wait_window(download_info)
-
-        # fix bug render toplevel when active it or it's parent widget
+        self.lock.release()
 
 
 class GraphicRiverUI(Frame):
@@ -590,9 +404,11 @@ class FrameUserManual(Frame):
             self.master, text='Usage', background='#8854d0', anchor='center')
         self.label_title.pack(fill='x')
 
-        self.image_graphicriver = ImageTk.PhotoImage(file='image/graphicriver.png')
+        self.image_graphicriver = ImageTk.PhotoImage(
+            file='image/graphicriver.png')
         self.text = 'Copy path of a template, and paste it into this entry'
-        self.label_text = Label(self.master, text=self.text, image = self.image_graphicriver,compound='left')
+        self.label_text = Label(
+            self.master, text=self.text, image=self.image_graphicriver, compound='left')
         self.label_text.image = self.image_graphicriver
         self.label_text.pack()
 

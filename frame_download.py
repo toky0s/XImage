@@ -234,3 +234,27 @@ class FrameDownload(Frame):
             
         self.message_done = messagebox.showinfo('Info', 'Done')
         self.master.destroy()
+
+
+class DownloadFrame(Frame):
+    
+    def __init__(self, master, option,**kw):
+        super().__init__(master=master)
+        self.option = option
+        self.setupUI()
+
+    def setupUI(self):
+        self.label_download = Label(self)
+        self.label_download['text'] = 'Download'
+        self.label_download.grid()
+
+        self.progressbar = Progressbar(self)
+        self.
+
+        self.label_image_downloaded = Label(self)
+        
+        self.update()
+    def update(self):
+        '''cập nhật lại giao diện'''
+        self.after(100, self.update)
+

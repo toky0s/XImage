@@ -1,5 +1,5 @@
 from CallTipWindow import createToolTip
-from frame_download import FrameDownload
+from frame_download import DownloadFrame
 
 from tkinter import messagebox, filedialog, StringVar, IntVar, PhotoImage, Tk, Toplevel
 from tkinter.ttk import Label, Progressbar, Entry, Frame, Radiobutton, Button, Checkbutton
@@ -11,8 +11,9 @@ import json
 import time
 import requests
 
-class FrameGroupRadiobutton(Frame):
 
+class FrameGroupRadiobutton(Frame):
+    '''Là một custom widget giúp bạn dễ dàng tạo một nhóm các radio button'''
     def __init__(self, master=None, side='left', variable=None, dict_option={}, initialize=""):
         super().__init__(master=master)
         self.side = side
@@ -30,16 +31,9 @@ class FrameGroupRadiobutton(Frame):
             radiobt_quality.pack(side=self.side, anchor='w')
 
 
-class DownloadInfomation(Toplevel):
-
-    def __init__(self, master=None, option=()):
-        super().__init__(master=master)
-        self.master = master
-        self.option = option
-        self.frame = FrameDownload(self,self.option)
-        self.frame.pack()
-
 class UnsplashUI(Frame):
+
+    '''Unsplash UI'''
 
     def __init__(self, master=None):
         super().__init__(master=master)
@@ -91,7 +85,7 @@ class UnsplashUI(Frame):
 
         QUALITIES = {
             'Raw': 'raw',
-            'Full':'full',
+            'Full': 'full',
             'Regular': 'regular',
             'Small': 'small',
             'Thumnail': 'thumb',
@@ -126,6 +120,7 @@ class UnsplashUI(Frame):
         button_download.grid(row=7, column=1)
 
     def disable_order_by_for_random(self):
+        '''Nếu random, nó sẽ disable một số widget không cần thiết'''
         if self.var_random.get() == 1:
             self.label_order_by.config(state='disable')
             self.label_name.config(state='disable')
@@ -144,22 +139,23 @@ class UnsplashUI(Frame):
                 child.config(state='normal')
 
     def choice_folder(self):
+        '''Bật folder select'''
         dialog_choice_folder = filedialog.askdirectory()
         self.var_folder_name.set(dialog_choice_folder)
 
     def check_paramenter_is_valid(self):
+        '''Kiểm tra đầu vào có hợp lệ hay không'''
         # check valid value
         if os.path.isdir(self.var_folder_name.get()):
             self.show_download_info_window()
         else:
             if self.var_folder_name.get() == '':
-                message_please_enter_path = messagebox.showwarning(
-                    'Warning', 'Please enter a path, where save images')
+                messagebox.showwarning('Warning', 'Please enter a path, where save images')
             elif os.path.isdir(self.var_folder_name.get()) == False:
-                message_folder_is_not_exist = messagebox.showwarning(
-                    'Warning', 'Path is not exist')
+                messagebox.showwarning('Warning', 'Path is not exist')
 
     def choice_request(self):
+        '''Chọn request thích hợp cho từng option, trả về một tuple chứa các thông tin cần thiết'''
         if self.var_random.get() == 1:
             # call random request
             request = 'https://unsplash.com/napi/photos/random'
@@ -170,7 +166,8 @@ class UnsplashUI(Frame):
         else:
             if self.var_name.get() == '':
                 request = 'https://unsplash.com/napi/photos'
-                params = params = {'page': self.var_page_number.get(), 'per_page': self.var_amount.get()}
+                params = params = {
+                    'page': self.var_page_number.get(), 'per_page': self.var_amount.get()}
                 folder_name = self.var_folder_name.get()
                 quality = self.var_quality_rb.get()
                 return (folder_name, quality, request, params)
@@ -181,22 +178,12 @@ class UnsplashUI(Frame):
                     'query': self.var_name.get(),
                     'page': self.var_page_number.get(),
                     'per_page': self.var_amount.get()
-                    }
+                }
                 folder_name = self.var_folder_name.get()
                 quality = self.var_quality_rb.get()
                 return (folder_name, quality, request, params)
 
-    def show_download_info_window(self):
-        download_info = DownloadInfomation(
-            master=self.master, option=self.choice_request())
-
-        download_info.after(100, download_info.frame.change_ui)
-
-        # download_info.transient(self.master)
-        # download_info.grab_set()
-        # self.master.wait_window(download_info)
-
-        # fix bug render toplevel when active it or it's parent widget
+        
 
 
 if __name__ == '__main__':
