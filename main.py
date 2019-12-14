@@ -200,9 +200,12 @@ class UnsplashUI(Frame):
             self.th_download = threading.Thread(target=self.download)
             self.th_download.start()
 
+            self.toplevel_info.protocol('WM_DELETE_WINDOW', self.closeToplevelWidget)
+
     def download(self):
         self.lock.acquire()
         per = 0
+        self.show = 1
         for image in self.listUnsplashImage:
             path = image.downloadThisImage(self.var_quality_rb.get(),self.var_folder_name.get())
 
@@ -216,6 +219,9 @@ class UnsplashUI(Frame):
 
             self.label_image['image'] = self.image_complete
             self.label_image.image = self.image_complete
+
+            if self.show == 0:
+                break
         
         # release data
         logging.info('show warning')
@@ -282,6 +288,8 @@ class UnsplashUI(Frame):
 
         self.lock.release()
 
+    def closeToplevelWidget(self):
+        self.show = 0
 
 class GraphicRiverUI(Frame):
 
