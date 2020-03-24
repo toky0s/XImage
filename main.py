@@ -1,8 +1,8 @@
 # complete code here
 from CallTipWindow import createToolTip
 
-from tkinter import messagebox, filedialog, StringVar, IntVar, PhotoImage, Tk, Toplevel, Text, Canvas
-from tkinter.ttk import Label, Progressbar, Entry, Frame, Radiobutton, Button, Checkbutton, Scrollbar
+from tkinter import messagebox, filedialog, StringVar, IntVar, PhotoImage, Tk, Toplevel
+from tkinter.ttk import Label, Progressbar, Entry, Frame, Radiobutton, Button, Checkbutton
 from PIL import Image, ImageTk
 from urllib import request
 from bs4 import BeautifulSoup
@@ -11,10 +11,11 @@ import os
 import json
 import requests
 import urllib.request
-import time
 import shutil
 import threading
 import logging
+
+# logging.basicConfig(level=logging.INFO)
 
 
 # unsplash
@@ -427,7 +428,7 @@ class GraphicRiverUI(Frame):
 
     def show_user_manual(self):
         # User manual
-        print('show manual')
+        logging.info('Show the user manual')
 
 
 
